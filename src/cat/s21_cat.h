@@ -12,7 +12,7 @@ typedef struct {
   int squeeze_s;              // s
   int tab_t;                  // t
   int print_non_printable_v;  // v
-  int ssss;                   // kostil
+  int ssss;                   // kostil ВАЖНО!
 } Flags;
 
 int no_arg_cat(int fd);

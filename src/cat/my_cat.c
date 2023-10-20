@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h> // для макроса
-#include<stdbool.h>
+#include <stdbool.h>
+#include <string.h>
+// добавить обработку заглавных букв 
+
 
 
 // fd = STDIN_FILENO; //= 1 если программа вызывается без аргументов, она будет читать данные из stdin
@@ -29,10 +32,67 @@ void catNoArgs(int fd){
     }
 }
 
-void catWithAgrs(int argc, char *argv[]){
-    catFlags flags = {0, 0, 0, 0, 0};
+
+
+
+bool catParseArg(catFlags *flags, char *argv[]){ // 
+    ++argv; //инкрементируем так как первый элемент это "-" ??????????/
+    if(*argv == "-"){
+        ++argv;
+        if(strcmp(argv, "number-nonblank") == 0) {//сравнивает строчки когда будет другой символ- он  выведет -1 ё
+            flags->number_empty = true;
+        }
+        else if(strcmp(argv, "number") == 0){
+            flags->number_all = true;
+        }
+        else if(strcmp(argv, "squeeze-blank") == 0){
+            flags->squeeze = true;  // добавить обработку заглавных букв 
+        else
+        {
+            /* code */
+        }
+        
+        return 1;
+    }
+    for (char *it = argv; *it != '\0' ; it++)
+    {
+        //первый аргумент это будет какой-то наш флаг
+        switch(*it){
+            case 'b':
+            flags->number_empty = true;
+            break; 
+            case 'e':
+            flags->show_end = true;
+            break;
+            case 'n':
+            flags->number_all = true;
+            break;
+            case 's':
+            flags->squeeze = true;
+            break;
+            case 't':
+            flags->show_tabs = true;
+            break;
+            default:
+            return false;
+
+        }
+    }
     
-    catNoArgs(open(argv[1], O_RDONLY));
+}
+ // "-ne" "-e" "-n"
+bool catWithAgrs(int argc, char *argv[]){
+    catFlags flags = {0, 0, 0, 0, 0};
+    for (int i = 1; i != argc; i++)
+    {
+        if(*argv [i] == '-')
+        if(!catParseArg( &flags, argv[i]) ){
+            return false;
+        } // &flags передаем адрес структуре 
+    }
+    
+
+    //catNoArgs(open(argv[1], O_RDONLY));
 }
 
 
@@ -41,10 +101,12 @@ int main(int argc, char *argv[]){
     (void)argv;
     if(argc == 1)
         catNoArgs(STDIN_FILENO);
-    else
-        catWithAgrs(argc,argv);
+    else{
+        if (catWithAgrs(argc,argv));
+            return 1;
+    }
+        
     return 0;
-    
 }
 
 

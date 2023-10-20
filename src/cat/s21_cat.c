@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {
   if (argc == 1)
-    no_arg_cat(STDIN_FILENO); // повторяет за пользователем ввод
+    no_arg_cat(STDIN_FILENO);  // повторяет за пользователем ввод
   else if (argc > 1) {
     Flags flags = cat_read_flags(argc, argv);
     files_output(argc, argv, flags, optind);

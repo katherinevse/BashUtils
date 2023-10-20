@@ -6,13 +6,13 @@
 #define SIZE 4096
 
 typedef struct {
-  int number_non_blank_b;     // b
-  int mark_end_e;             // e
-  int number_all_n;           // n
-  int squeeze_s;              // s
-  int tab_t;                  // t
-  int print_non_printable_v;  // v
-  int ssss;                   // kostil ВАЖНО!
+    int number_non_blank_b;     // b
+    int mark_end_e;             // e
+    int number_all_n;           // n
+    int squeeze_s;              // s
+    int tab_t;                  // t
+    int print_non_printable_v;  // v
+    int ssss;                   // kostil ВАЖНО!
 } Flags;
 
 int no_arg_cat(int fd);

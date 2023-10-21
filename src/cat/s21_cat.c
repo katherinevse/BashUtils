@@ -22,8 +22,11 @@ void getFlags(const int argc, char **const argv) {
 
   for (int i = 1; i < argc; i++) { // i это аргумент строки нашей
     if (argv[i][0] == '-' && argv[i][1] != '-' && isFile == 0) { // проверяем что i строка c нулевым символом является "-" и второй аргумент не является "-" (типа файл) и file = 0 =программа еще не начала обрабатывать файлы.
-      for (int j = 1; j < (int)strlen(argv[i]); j++) {
-        switch (argv[i][j]) {
+      for (int j = 1; j < (int)strlen(argv[i]); j++) { // Внутри этого цикла обрабатываются символы после первого дефиса '-'
+    // в текущем аргументе командной строки.
+    //j будет использоваться для итерации по символам внутри текущего аргумента командной строки.
+    //(int)strlen(argv[i]) используется для получения длины строки и приведения ее к типу int.
+        switch (argv[i][j]) { // как он тут понимает, что первое это строка а второй это символы 
           case 'b':
             flags.b_flag = 1;
             break;
@@ -53,8 +56,9 @@ void getFlags(const int argc, char **const argv) {
             break;
         }
       }
-    } else if (argv[i][0] == '-' && argv[i][1] == '-' && isFile == 0) {
-      if (strcmp(argv[i], "--number-nonblank"))
+    } else if (argv[i][0] == '-' && argv[i][1] == '-' && isFile == 0) { // проверка на '- -' 
+      if (strcmp(argv[i], "--number-nonblank")) // сравниваем аргументы  
+      // if (strcmp(argv[i], "--number-nonblank") == 0)
         flags.b_flag = 1;
       else if (strcmp(argv[i], "--number"))
         flags.n_flag = 1;

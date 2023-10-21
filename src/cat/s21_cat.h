@@ -1,22 +1,23 @@
-#include <getopt.h>
+#ifndef SRC_S21_CAT_H_
+#define SRC_S21_CAT_H_
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <string.h>
 
-#define SIZE 4096
+struct FlagsStructure {
+  int err_flag;
+  int b_flag;
+  int e_flag;
+  int E_flag;
+  int n_flag;
+  int s_flag;
+  int t_flag;
+  int T_flag;
+  int v_flag;
+};
 
-typedef struct {
-    int number_non_blank_b;     // b
-    int mark_end_e;             // e
-    int number_all_n;           // n
-    int squeeze_s;              // s
-    int tab_t;                  // t
-    int print_non_printable_v;  // v
-    int ssss;                   // kostil ВАЖНО!
-} Flags;
+void output(const struct FlagsStructure flags, char *fileName, FILE **file);
+void getFlags(const int argc, char **const argv);
 
-int no_arg_cat(int fd);
-Flags cat_read_flags(int argc, char *argv[]);
-void out_print(char *file_name, Flags flag);
-void files_output(int argc, char **argv, Flags flag, int optind);
-int is_file(char *file_name);
+#endif  // SRC_S21_CAT_H_

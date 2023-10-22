@@ -18,7 +18,7 @@ void getFlags(const int argc, char **const argv) {
   flags.err_flag = 0;  // Флаг для обозначения ошибок в аргументах командной строки
 
 
-  int isFile = 0; // чтобы понять это файл или опция 
+  int isFile = 0; // чтобы понять это файл или опция   <<<< isFile++;: Это увеличивает счетчик файлов (isFile). Этот счетчик используется, чтобы отслеживать, началась ли уже обработка файлов в командной строке. Если isFile был равен 0, это означает, что программа еще не начинала обработку файлов.
 
   for (int i = 1; i < argc; i++) { // i это аргумент строки нашей
     if (argv[i][0] == '-' && argv[i][1] != '-' && isFile == 0) { // проверяем что i строка c нулевым символом является "-" и второй аргумент не является "-" (типа файл) и file = 0 =программа еще не начала обрабатывать файлы.
@@ -56,6 +56,8 @@ void getFlags(const int argc, char **const argv) {
             break;
         }
       }
+
+    // Оператор switch в C поддерживает только целочисленные значения (и символы), и не позволяет использовать строки в качестве кейсов.
     } else if (argv[i][0] == '-' && argv[i][1] == '-' && isFile == 0) { // проверка на '- -' 
       if (strcmp(argv[i], "--number-nonblank")) // сравниваем аргументы  
       // if (strcmp(argv[i], "--number-nonblank") == 0)
@@ -69,37 +71,43 @@ void getFlags(const int argc, char **const argv) {
     } else {
       isFile++;
       FILE *readFile;
-      // printf("%s", argv[i]);
+      //printf("%s", argv[i]);
       output(flags, argv[i], &readFile);
     }
   }
 }
 
-void output(const struct FlagsStructure flags, char *fileName, FILE **file) {
-  *file = fopen(fileName, "r");
-  int ch;
-  int prev;
-  int blank_lines = 0;
+void output(const struct FlagsStructure flags, char *fileName, FILE **file) { // FILE **file почему тут два указателя? на что эти указатели?
+
+  *file = fopen(fileName, "r"); // указатель на файл, почему не сам файл? 
+  int ch; // будет храниться текущий символ, считанный из файла.
+  int prev; // для хранения предыдущего символа, чтобы обнаруживать изменения строк.
+  int blank_lines = 0; // отслеживает количество пустых строк
   char *symbols[33] = {"^@", "^A", "^B", "^C", "^D",  "^E", "^F", "^G",
                        "^H", "^I", "$",  "^K", "^L",  "^M", "^N", "^O",
-                       "^P", "^Q", "^R", "^S", "^T",  "^U", "^V", "^W",
-                       "^X", "^Y", "^Z", "^[", "^\\", "^]", "^^", "^_"};
-  int is_first_ch = 1;
+                       "^P", "^Q", "^R", "^S", "^T",  "^U", "^V", "^W", 
+                       "^X", "^Y", "^Z", "^[", "^\\", "^]", "^^", "^_"}; 
+                       //массив строк, представляющих специальные символы, которые могут встречаться в текст
+  int is_first_ch = 1; // Флаг, указывающий, является ли текущий символ первым в файле.
 
-  if (!flags.err_flag) {
-    if (*file != NULL) {
-      int counter = 1;
-      while (!feof(*file) && !ferror(*file)) {
-        ch = getc(*file);
-        if (ch != EOF) {
-          if ((ch == '\n' && prev == '\n') ||
+  if (!flags.err_flag) { // нет ошибок во флагах
+    if (*file != NULL) { // успешно открылся файл
+      int counter = 1; // нумерации строк при выводе на экран
+      while (!feof(*file) && !ferror(*file)) {   // feof(*file) - это функция, которая проверяет, достигнут ли конец файла
+      // ferror(*file)  Отсутствие файла, любые нарушения
+        ch = getc(*file); //  у нас цикл, В каждой итерации цикла вызывается getc(*file), что означает получение очередного символа из файла, на который указывает указатель file. Полученный символ сохраняется в переменной ch.
+        if (ch != EOF) { // символ не конец строки
+          if ((ch == '\n' && prev == '\n') || // не новая строка и потом не новая строка 
               (is_first_ch == 1 && ch == '\n')) {
-            blank_lines++;
+
+                //HELLO h e
+            blank_lines++; // либо 0 либо 1
           } else {
             blank_lines = 0;
           }
-          if (blank_lines < 2 || !flags.s_flag) {
-            if ((ch != '\n' && flags.b_flag) || (is_first_ch && flags.n_flag)) {
+        // blank_lines = 0
+          if (blank_lines < 2 || !flags.s_flag) { // squeeze и подряд нет строк
+            if ((ch != '\n' && flags.b_flag) || (is_first_ch && flags.n_flag)) { ///// stop
               if (prev == '\n') {
                 printf("%6d\t", counter);
                 counter++;

@@ -1,198 +1,115 @@
+
 #include "s21_cat.h"
 
-int main(const int argc, char **const argv) {
-  getFlags(argc, argv);
-  return 0;
+void parcer(int argc, char *argv[], opt *options);
+void read_file(int argc, char *argv[], opt *options);
+
+void Cat_Printf(int argc, char *argv[]) {
+  if (argc == 1) {
+    char cur = getchar();
+    while (cur != EOF) {
+      printf("%c", cur);
+      cur = getchar();
+    }
+  } else {
+    parcer(argc, argv, &options);
+    read_file(argc, argv, &options);
+  }
 }
 
-void getFlags(const int argc, char **const argv) {
-  struct FlagsStructure flags;
-  flags.b_flag = 0;    // Нумеровать только непустые строки, отменяет -n
-  flags.e_flag = 0;    // Выводить символ $ в конце каждой строки
-  flags.E_flag = 0;    // Выводить символ $ в конце каждой строки (переопределяет -e)
-  flags.n_flag = 0;    // Нумеровать все строки вывода
-  flags.s_flag = 0;    // Подавлять повторяющиеся пустые строки
-  flags.t_flag = 0;    // Отображать символы TAB как ^I
-  flags.T_flag = 0;    // Отображать символы TAB как ^I (переопределяет -t)
-  flags.v_flag = 0;    // Отображать непечатные символы, за исключением новых строк и символов табуляции
-  flags.err_flag = 0;  // Флаг для обозначения ошибок в аргументах командной строки
+void parcer(int argc, char *argv[], opt *options) {
+  int ch = 0;
+  static struct option long_options[] = {{"number-nonblank", 0, 0, 'b'}, // из видео статик   
+                                         {"number", 0, 0, 'n'}, // почему опции равны нулю?
+                                         {"squeeze-blank", 0, 0, 's'},
+                                         {0, 0, 0, 0}};
 
 
-  int isFile = 0; // чтобы понять это файл или опция   <<<< isFile++;: Это увеличивает счетчик файлов (isFile). Этот счетчик используется, чтобы отслеживать, началась ли уже обработка файлов в командной строке. Если isFile был равен 0, это означает, что программа еще не начинала обработку файлов.
 
-  for (int i = 1; i < argc; i++) { // i это аргумент строки нашей
-    if (argv[i][0] == '-' && argv[i][1] != '-' && isFile == 0) { // проверяем что i строка c нулевым символом является "-" и второй аргумент не является "-" (типа файл) и file = 0 =программа еще не начала обрабатывать файлы.
-      for (int j = 1; j < (int)strlen(argv[i]); j++) { // Внутри этого цикла обрабатываются символы после первого дефиса '-'
-    // в текущем аргументе командной строки.
-    //j будет использоваться для итерации по символам внутри текущего аргумента командной строки.
-    //(int)strlen(argv[i]) используется для получения длины строки и приведения ее к типу int.
-        switch (argv[i][j]) { // как он тут понимает, что первое это строка а второй это символы 
-          case 'b':
-            flags.b_flag = 1;
-            break;
-          case 'e':
-            flags.e_flag = 1;
-            break;
-          case 'n':
-            flags.n_flag = 1;
-            break;
-          case 's':
-            flags.s_flag = 1;
-            break;
-          case 't':
-            flags.t_flag = 1;
-            break;
-          case 'v':
-            flags.v_flag = 1;
-            break;
-          case 'E':
-            flags.E_flag = 1;
-            break;
-          case 'T':
-            flags.T_flag = 1;
-            break;
-          default:
-            flags.err_flag = 1;
-            break;
-        }
-      }
-
-    // Оператор switch в C поддерживает только целочисленные значения (и символы), и не позволяет использовать строки в качестве кейсов.
-    } else if (argv[i][0] == '-' && argv[i][1] == '-' && isFile == 0) { // проверка на '- -' 
-      if (strcmp(argv[i], "--number-nonblank")) // сравниваем аргументы  
-      // if (strcmp(argv[i], "--number-nonblank") == 0)
-        flags.b_flag = 1;
-      else if (strcmp(argv[i], "--number"))
-        flags.n_flag = 1;
-      else if (strcmp(argv[i], "--squeeze-blank"))
-        flags.s_flag = 1;
-      else
-        flags.err_flag = 1;
-    } else {
-      isFile++;
-      FILE *readFile;
-      //printf("%s", argv[i]);
-      output(flags, argv[i], &readFile);
+  while ((ch = getopt_long(argc, argv, "+benstvTE", long_options, 0)) != -1) { // тут почему 0 в конце и почему -1 // + если мы дойдем до флага -> все остальное это файлы 
+    switch (ch) {
+      case 'b':
+        options->b = 1;
+        break;
+      case 'e':
+        options->e = 1;
+        options->v = 1;
+        break;
+      case 'n':
+        options->n = 1;
+        break;
+      case 's':
+        options->s = 1; 
+        break;
+      case 't':
+        options->t = 1;
+        options->v = 1;
+        break;
+      case 'v':
+        options->v = 1;
+        break;
+      case 'T':
+        options->t = 1;
+        break;
+      case 'E':
+        options->e = 1;
+        break;
+      default:
+        fprintf(stderr, "usage: cat [-benstuv] [file ...]\n");
     }
   }
 }
 
-void output(const struct FlagsStructure flags, char *fileName, FILE **file) { // FILE **file почему тут два указателя? на что эти указатели?
-
-  *file = fopen(fileName, "r"); // указатель на файл, почему не сам файл? 
-  int ch; // будет храниться текущий символ, считанный из файла.
-  int prev; // для хранения предыдущего символа, чтобы обнаруживать изменения строк.
-  int blank_lines = 0; // отслеживает количество пустых строк
-  char *symbols[33] = {"^@", "^A", "^B", "^C", "^D",  "^E", "^F", "^G",
-                       "^H", "^I", "$",  "^K", "^L",  "^M", "^N", "^O",
-                       "^P", "^Q", "^R", "^S", "^T",  "^U", "^V", "^W", 
-                       "^X", "^Y", "^Z", "^[", "^\\", "^]", "^^", "^_"}; 
-                       //массив строк, представляющих специальные символы, которые могут встречаться в текст
-  int is_first_ch = 1; // Флаг, указывающий, является ли текущий символ первым в файле.
-
-  if (!flags.err_flag) { // нет ошибок во флагах
-    if (*file != NULL) { // успешно открылся файл
-      int counter = 1; // нумерации строк при выводе на экран
-      while (!feof(*file) && !ferror(*file)) {   // feof(*file) - это функция, которая проверяет, достигнут ли конец файла
-      // ferror(*file)  Отсутствие файла, любые нарушения
-        ch = getc(*file); //  у нас цикл, В каждой итерации цикла вызывается getc(*file), что означает получение очередного символа из файла, на который указывает указатель file. Полученный символ сохраняется в переменной ch.
-        if (ch != EOF) { // символ не конец строки
-          if ((ch == '\n' && prev == '\n') || // не новая строка и потом не новая строка 
-              (is_first_ch == 1 && ch == '\n')) {
-
-                //HELLO h e
-            blank_lines++; // либо 0 либо 1
-          } else {
-            blank_lines = 0;
+void read_file(int argc, char *argv[], opt *options) {
+  int cur = 0;
+  while (optind < argc) {
+    FILE *fp = fopen(argv[optind], "r"); //optind это указатель на слеж
+    if (fp) {
+      int str_count = 1;
+      int counter = 1;
+      while ((cur = fgetc(fp)) != EOF) {
+        if (cur == '\n' && counter > 1 && options->s) {
+          continue;
+        }
+        if (options->b && counter && cur != '\n') {
+          printf("%6d\t", str_count++);
+          counter = 0;
+        }
+        if ((options->n && counter) && !(options->b)) {
+          printf("%6d\t", str_count++);
+        }
+        if (options->e && cur == '\n') {
+          printf("$");
+        }
+        if (options->t && cur == '\t') {
+          printf("^I");
+          counter = 0;
+          continue;
+        }
+        if (options->v) {
+          if ((cur < 9 || cur > 10) && cur < 32) {
+            printf("%c", '^');
+            cur = cur + 64;
           }
-        // blank_lines = 0
-          if (blank_lines < 2 || !flags.s_flag) { // squeeze и подряд нет строк
-            if ((ch != '\n' && flags.b_flag) || (is_first_ch && flags.n_flag)) { ///// stop
-              if (prev == '\n') {
-                printf("%6d\t", counter);
-                counter++;
-              } else if (is_first_ch && (flags.n_flag || flags.b_flag)) {
-                if (ch == '\n' && (flags.e_flag || flags.E_flag)) {
-                  if (!flags.b_flag) {
-                    printf("%6d\t", counter);
-                    counter++;
-                  }
-                } else if (is_first_ch && (flags.n_flag || flags.b_flag)) {
-                  if (flags.b_flag && ch == '\n') {
-                  } else {
-                    printf("%6d\t", counter);
-                    counter++;
-                  }
-                }
-              }
-            }
-            if (ch == '\n' && (flags.E_flag || flags.e_flag)) {
-              printf("$\n");
-            } else if (ch == '\t' && (flags.T_flag || flags.t_flag)) {
-              printf("^I");
-            } else {
-              if (((ch >= 0 && ch <= 31 && ch != 9 && ch != 10) || ch == 127) &&
-                  (flags.v_flag || flags.e_flag || flags.t_flag))
-                if (ch == 127)
-                  printf("^?");
-                else
-                  printf("%s", symbols[ch]);
-              else {
-                putchar(ch);
-              }
-            }
-
-            if (ch == '\n' && flags.n_flag && !flags.b_flag &&
-                (!flags.E_flag || !flags.e_flag) && !flags.s_flag) {
-              ch = getc(*file);
-              if (ch == EOF) {
-              } else {
-                fseek(*file, -1, SEEK_CUR);
-                printf("%6d\t", counter);
-                counter++;
-              }
-            }
-
-            if (ch == '\n' && flags.n_flag && !flags.b_flag &&
-                (!flags.E_flag || !flags.e_flag) && flags.s_flag &&
-                blank_lines < 2) {
-              // ch = getc(*file);
-              // if (ch == EOF) {
-              // } else {
-              //   fseek(*file, -1, SEEK_CUR);
-              //   printf("%6d\t", counter);
-              //   counter++;
-              // }
-              int seek_count = 0;
-              int is_end = 0;
-              while (ch != EOF) {
-                ch = getc(*file);
-                if (ch != '\n' && ch != EOF) {
-                  is_end = 1;
-                }
-                seek_count++;
-              }
-              if (!is_end) {
-                printf("%6d\t", counter);
-                if (flags.e_flag) printf("$\n");
-              } else {
-                fseek(*file, -seek_count, SEEK_CUR);
-                ch = getc(*file);
-                printf("%6d\t", counter);
-                counter++;
-              }
-            }
+          if (cur > 127 && cur < 160) {
+            printf("%c%c%c", 'M', '-', '^');
+            cur = cur + 192;
+          } else if (cur == 127) {
+            cur = '?';
+            printf("^");
           }
         }
-        prev = ch;
-        is_first_ch = 0;
+        if (cur == '\n') {
+          counter++;
+        } else {
+          counter = 0;
+        }
+        putchar(cur);
       }
-      fclose(*file);
+      fclose(fp);
     } else {
-      fprintf(stderr, "cat: %s: No such file or directory\n", fileName);
+      fprintf(stderr, "s21_cat: %s: No such file or directory\n", argv[optind]);
     }
-
-  } else {
-    fprintf(stderr, "usage: cat [-benstv] [file ...]\n");
+    optind++;
   }
 }

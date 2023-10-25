@@ -15,9 +15,7 @@ typedef struct options {
 } opt;
 opt options = {0};
 
-
-void Cat_Printf(int argc, char *argv[]);
-
-int main(int argc, char *argv[]) { read_file(argc, argv); }
+void parcer(int argc, char *argv[], opt *options);
+void read_file(int argc, char *argv[], opt *options);
 
 #endif

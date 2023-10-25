@@ -24,8 +24,6 @@ void parcer(int argc, char *argv[], opt *options) {
                                          {"squeeze-blank", 0, 0, 's'},
                                          {0, 0, 0, 0}};
 
-
-
   while ((ch = getopt_long(argc, argv, "+benstvTE", long_options, 0)) != -1) { // тут почему 0 в конце и почему -1 // + если мы дойдем до флага -> все остальное это файлы 
     switch (ch) {
       case 'b':
@@ -66,7 +64,7 @@ void read_file(int argc, char *argv[], opt *options) {
     FILE *fp = fopen(argv[optind], "r"); //optind это указатель на слеж
     if (fp) {
       int str_count = 1;
-      int counter = 1;
+      int counter = 1; // счетчик чего?  почему устанавливаем сюда единицу? 
       while ((cur = fgetc(fp)) != EOF) {
         if (cur == '\n' && counter > 1 && options->s) {
           continue;
@@ -108,7 +106,7 @@ void read_file(int argc, char *argv[], opt *options) {
       }
       fclose(fp);
     } else {
-      fprintf(stderr, "s21_cat: %s: No such file or directory\n", argv[optind]);
+      fprintf(stderr, "s21_cat: %s: No such file or directory\n", argv[optind]);// что такое stderr
     }
     optind++;
   }

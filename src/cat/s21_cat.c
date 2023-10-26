@@ -15,9 +15,9 @@ int main(int argc, char *argv[]) {
 void parser(int argc, char *argv[], opt *options) {
     int flag = 0;
     static struct option long_options[] = {{"number-nonblank", 0, 0, 'b'},  // из видео статик
-                                           {"number", 0, 0, 'n'},  // почему опции равны нулю?
+                                           {"number", 0, 0, 'n'},  // какие-то доп опции, но их нет, поэтому 0
                                            {"squeeze-blank", 0, 0, 's'},
-                                           {0, 0, 0, 0}};
+                                           {0, 0, 0, 0}};// массив опций закончен
     while ((flag = getopt_long(argc, argv, "+benstvTE", long_options, 0)) !=
            -1) {  // тут почему 0 в конце и почему -1 // + если мы дойдем до флага -> все остальное это файлы
         switch (flag) {
@@ -51,7 +51,7 @@ void parser(int argc, char *argv[], opt *options) {
                 fprintf(stderr, "usage: cat [-benstuv] [file ...]\n");
         }
     }
-    read_file(argc, argv, options);  // почему здесь тогда мы не передаем адрес?
+    read_file(argc, argv, options); 
 }
 
 void read_file(int argc, char *argv[], opt *options) {
@@ -65,7 +65,7 @@ void print_options(int cur, char *argv[], opt *options) {
     FILE *file = fopen(argv[optind], "r");  // optind это указатель на слеж
     if (file) {
         int str_count = 1;
-        int counter = 1;                      // строка не пустая
+        int counter = 1;                      // строка не пустая для b и n
         while ((cur = fgetc(file)) != EOF) {  // считываем из файла
             if (cur == '\n' && counter > 1 && options->s) {
                 continue;
@@ -91,7 +91,7 @@ void print_options(int cur, char *argv[], opt *options) {
                     cur = cur + 64;  // неотображаемые управляющие символы представляются в виде ^ и
                                      // соответствующей буквы.
                 }
-                if (cur > 127 && cur < 160) {
+                if (cur > 127 && cur < 160) { //латинские буквы до 159
                     printf("%c%c%c", 'M', '-', '^');
                     cur = cur + 192;
                 } else if (cur == 127) {

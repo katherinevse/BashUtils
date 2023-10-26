@@ -16,9 +16,8 @@ clean:
 	rm -rf *.gch
 
 
-
-WWW = -Werror -Wextra -Wall
 G = gcc
+WWW = -Werror -Wextra -Wall
 
 all : s21_cat
 	$(G) $(WWW) s21_cat.c s21_cat.h -o s21_cat

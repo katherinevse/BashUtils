@@ -4,17 +4,18 @@
 //принимает указатель 
 
 int main(int argc, char *argv[]) { 
-  parser(argc, argv, &options); 
-}
-
-void parser(int argc, char *argv[], opt *options) {
     if (argc == 1) {
         char ch = getchar();         
         while (ch != EOF) {
             printf("%c", ch);
             ch = getchar();
         }
-    } else {
+    }
+    else
+        parser(argc, argv, &options); 
+}
+
+void parser(int argc, char *argv[], opt *options) {
         int flag = 0;
         static struct option long_options[] = {{"number-nonblank", 0, 0, 'b'},  // из видео статик
                                                {"number", 0, 0, 'n'},  // почему опции равны нулю?
@@ -53,7 +54,6 @@ void parser(int argc, char *argv[], opt *options) {
                     fprintf(stderr, "usage: cat [-benstuv] [file ...]\n");
             }
         }
-    }
     read_file(argc, argv, options); // почему здесь тогда мы не передаем адрес? 
 }
 
@@ -76,11 +76,13 @@ void print_options(int cur, char *argv[], opt *options){
                     continue;
                 }
                 if (options->b && counter && cur != '\n') {
-                    printf("%6d\t", str_count++);  // "%6d\t"
+                    printf("%6d\t", str_count);  // "%6d\t"
+                    str_count++;
                     counter = 0; // текущая строка не пустая
                 } 
                 if ((options->n && counter) && !(options->b)) {
-                    printf("%6d\t", str_count++);
+                    printf("%6d\t", str_count);
+                    str_count++;
                 }
                 if (options->e && cur == '\n') {
                     printf("$");

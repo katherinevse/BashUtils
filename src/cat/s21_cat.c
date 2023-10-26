@@ -1,22 +1,28 @@
 
 #include "s21_cat.h"
+//передем адрес структуры
+//принимает указатель 
 
-void parcer(int argc, char *argv[], opt *options) {
+int main(int argc, char *argv[]) { 
+  parser(argc, argv, &options); 
+}
+
+void parser(int argc, char *argv[], opt *options) {
     if (argc == 1) {
-        char ch = getchar();
+        char ch = getchar();         
         while (ch != EOF) {
             printf("%c", ch);
             ch = getchar();
         }
     } else {
-        int ch = 0;
+        int flag = 0;
         static struct option long_options[] = {{"number-nonblank", 0, 0, 'b'},  // из видео статик
                                                {"number", 0, 0, 'n'},  // почему опции равны нулю?
                                                {"squeeze-blank", 0, 0, 's'},
                                                {0, 0, 0, 0}};
         while (
-            (ch = getopt_long(argc, argv, "+benstvTE", long_options, 0)) !=-1) {  // тут почему 0 в конце и почему -1 // + если мы дойдем до флага -> все остальное это файлы
-            switch (ch) {
+            (flag = getopt_long(argc, argv, "+benstvTE", long_options, 0)) !=-1) {  // тут почему 0 в конце и почему -1 // + если мы дойдем до флага -> все остальное это файлы
+            switch (flag) {
                 case 'b':
                     options->b = 1;
                     break;
@@ -48,24 +54,31 @@ void parcer(int argc, char *argv[], opt *options) {
             }
         }
     }
-    read_file(argc, argv, options);
+    read_file(argc, argv, options); // почему здесь тогда мы не передаем адрес? 
 }
 
 void read_file(int argc, char *argv[], opt *options) {
     int cur = 0;
-    while (optind < argc) {
-        FILE *fp = fopen(argv[optind], "r");  // optind это указатель на слеж
-        if (fp) {
-            int str_count = 1;
-            int counter = 1;  // счетчик чего?  почему устанавливаем сюда единицу?
-            while ((cur = fgetc(fp)) != EOF) {
-                if (cur == '\n' && counter > 1 && options->s) {
+    while (optind < argc) { 
+        print_options(cur, argv, options);
+    }
+}
+
+
+void print_options(int cur, char *argv[], opt *options){
+    FILE *file = fopen(argv[optind], "r");  // optind это указатель на слеж
+        if (file) {
+            int str_count = 1; 
+            int counter = 1; // строка не пустая  
+            while ((cur = fgetc(file)) != EOF) { // считываем из файла 
+
+                if (cur == '\n' && counter > 1 && options->s) { 
                     continue;
                 }
                 if (options->b && counter && cur != '\n') {
                     printf("%6d\t", str_count++);  // "%6d\t"
-                    counter = 0;
-                }
+                    counter = 0; // текущая строка не пустая
+                } 
                 if ((options->n && counter) && !(options->b)) {
                     printf("%6d\t", str_count++);
                 }
@@ -97,12 +110,10 @@ void read_file(int argc, char *argv[], opt *options) {
                 }
                 putchar(cur);
             }
-            fclose(fp);
+            fclose(file);
         } else {
             fprintf(stderr, "s21_cat: %s: No such file or directory\n", argv[optind]);  // что такое stderr
         }
         optind++;
-    }
 }
 
-int main(int argc, char *argv[]) { parcer(argc, argv, &options); }

@@ -15,7 +15,10 @@ typedef struct options {
 } opt;
 opt options = {0};
 
-void parcer(int argc, char *argv[], opt *options);
+void just_cat(int argc, char *argv[]);
+void print_options(int cur, char *argv[], opt *options);
+void parser(int argc, char *argv[], opt *options);
 void read_file(int argc, char *argv[], opt *options);
+
 
 #endif

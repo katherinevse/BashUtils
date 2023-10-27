@@ -20,5 +20,4 @@ void print_options(int cur, char *argv[], opt *options);
 void parser(int argc, char *argv[], opt *options);
 void read_file(int argc, char *argv[], opt *options);
 
-
 #endif

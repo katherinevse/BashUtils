@@ -96,7 +96,9 @@ void print_options(int cur, char *argv[], opt *options) {
         if (cur > 127 && cur < 160) {  //латинские буквы до 159
           printf("M-^");
           cur = cur + 192;
-        } else if (cur == 127) {
+        } else if (cur == 127) { //управляющие символы (символы ASCII с кодом 0-31 и 127) и метасимволы (с кодом либо от 128 по 256, либо от -128 до -1). 
+
+
           cur = '?';
           printf("^");
         }

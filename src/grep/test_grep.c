@@ -34,14 +34,14 @@ void Grep_Printf(int argc, char *argv[]) {
 
 
 void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
-  int opt = 0;
-  int reg_flag = 0; // установки флагов регулярных выражений
-  char pattern[1024]; // для хранения шаблона регулярного выражения. При обработке опции -e, значение этой опции (которое передается через optarg
-  while ((opt = getopt_long(argc, argv, "e:ivclnsoh", NULL, NULL)) != (-1)) {
-    switch (opt) {
+  int flag = 0;
+  int reg_flag = 0; // установки флагов регулярных выражений, для i, для е
+  char pattern[1000]; // для хранения шаблона регулярного выражения. При обработке опции -e, значение этой опции (которое передается через optarg
+  while ((flag = getopt_long(argc, argv, "e:ivclnsoh", NULL, NULL)) != (-1)) {
+    switch (flag) {
       case 'i':
         options->i = 1;
-        reg_flag = REG_ICASE;
+        reg_flag = REG_ICASE; // поиск должен быть регистронезависимым
         break;
       case 'v':
         options->v = 1;
@@ -63,8 +63,8 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
         break;
       case 'e':
         options->e = 1;
-        strcat(pattern, optarg);
-        strcat(pattern, "|");
+        strcat(pattern, optarg); // optarg- аргумент в данный момент 
+        strcat(pattern, "|"); //чтобы создать шаблон, который будет включать в себя несколько подшаблонов, разделенных символом |.
         if (reg_flag == 0) {
           reg_flag = 1;
         }

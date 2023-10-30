@@ -20,7 +20,6 @@ typedef struct options {
 } opt;
 opt options = {0};
 
-
-
+void parcer(int argc, char *argv[], opt *options, regex_t *regex);
 
 #endif

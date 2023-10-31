@@ -63,20 +63,24 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
         break;
       case 'e':
         options->e = 1;
-        strcat(pattern, optarg); // optarg- аргумент в данный момент 
+        strcat(pattern, optarg); // optarg- аргумент в данный момент // optind - индекс  // указатель просто указывает на элемент массива argv[]).   // pattern = argument(name)
         strcat(pattern, "|"); //чтобы создать шаблон, который будет включать в себя несколько подшаблонов, разделенных символом |.
         if (reg_flag == 0) {
-          reg_flag = 1;
+          reg_flag = 1; // REG_EXTENDED_FLAG
         }
         pattern[strlen(pattern) - 1] = '\0';
         break;
     }
   }
+
   if (options->e) {
-    regcomp(regex, pattern, reg_flag);
+    regcomp(regex, pattern, reg_flag);//regex: Это указатель на структуру regex_t, в которую будет сохранено скомпилированное регулярное выражение.
+    //pattern: Это строка, содержащая само регулярное выражение, которое нужно скомпилировать
+    //pattern: Это строка, содержащая само регулярное выражение, которое нужно скомпилировать
+
   } else {
-    regcomp(regex, argv[optind], reg_flag);
-    optind++;
+    regcomp(regex, argv[optind], reg_flag); //Если опция -e не указана, программа просто берет следующий аргумент из командной строки (argv[optind]) и компилирует его как регулярное выражение. 
+    optind++; //optind увеличивается для перехода к следующему аргументу
   }
 }
 

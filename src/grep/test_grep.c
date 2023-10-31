@@ -68,7 +68,8 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
         if (reg_flag == 0) {
           reg_flag = 1; // REG_EXTENDED_FLAG
         }
-        pattern[strlen(pattern) - 1] = '\0';
+        pattern[strlen(pattern) - 1] = '\0';// можно удалить //strncat(pattern, "", 1);
+
         break;
     }
   }
@@ -83,6 +84,7 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
     optind++; //optind увеличивается для перехода к следующему аргументу
   }
 }
+// почему после отработки флага е мы заканчиваем парсить что-любо?
 
 void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex) {
   FILE *fp;
@@ -92,8 +94,9 @@ void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex) {
   int status = 0;
   int str_count = 0;
   int str_count_c = 0;
-  int names = 0;
-  names = argc - optind;
+  int num_files = 0; // Определяем количество переданных файлов для поиска
+  num_files = argc - optind;
+  
   while (optind < argc) {
     fp = fopen(argv[optind], "r");
     if (fp) {
@@ -103,7 +106,7 @@ void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex) {
         str_count++;
         if ((options->v && status == REG_NOMATCH) ||
             (status == 0 && (options->v == 0 || options->e))) {
-          if (names > 1 && options->h == 0 && options->c == 0 &&
+          if (num_files > 1 && options->h == 0 && options->c == 0 &&
               options->l == 0) {
             printf("%s:", argv[optind]);
           }
@@ -126,7 +129,7 @@ void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex) {
         }
       }
       if (options->c) {
-        if (names > 1 && options->h == 0) {
+        if (num_files > 1 && options->h == 0) {
           printf("%s:%d\n", argv[optind], str_count_c);
         } else {
           printf("%d\n", str_count_c);

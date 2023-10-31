@@ -21,5 +21,5 @@ typedef struct options {
 opt options = {0};
 
 void parcer(int argc, char *argv[], opt *options, regex_t *regex);
-
+void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex);
 #endif

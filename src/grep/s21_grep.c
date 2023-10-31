@@ -33,11 +33,11 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
   int flag = 0;
   int reg_flag = 0; // установки флагов регулярных выражений, для i, для е
   char pattern[1000]; // для хранения шаблона регулярного выражения. При обработке опции -e, значение этой опции (которое передается через optarg
-  while ((flag = getopt_long(argc, argv, "e:ivclnsoh", NULL, NULL)) != (-1)) {
+  while ((flag = getopt_long(argc, argv, "e:ivclnsoh", NULL, NULL)) != (-1)) { // почему именно такая запись? e:ivclnsoh
     switch (flag) {
       case 'i':
         options->i = 1;
-        reg_flag = REG_ICASE; // поиск должен быть регистронезависимым
+        reg_flag = REG_ICASE; 
         break;
       case 'v':
         options->v = 1;
@@ -86,12 +86,19 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
 void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex){
   FILE *file;
   char *line = 0;
+  int read = 0; // возвращает количество считанных символов
 
-  int num_files = argc - optind;; // Определяем количество переданных файлов для поиска
+  int num_files = argc - optind; // Определяем количество переданных файлов для поиска
   while(optind<argc){
     file = fopen(argv[optind], "r");
     if (file){
+      int over = 0;
+      while ((read = getline(&line, &len, fp)) != EOF) {
 
+
+
+      }
     }
+    
   }
 }

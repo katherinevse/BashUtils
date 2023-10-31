@@ -90,19 +90,19 @@ void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex) {
   FILE *fp;
   char *line = NULL;
   size_t len = 0;
-  int read = 0;
+  int read = 0; // возвращает количество считанных символов
   int status = 0;
   int str_count = 0;
   int str_count_c = 0;
   int num_files = 0; // Определяем количество переданных файлов для поиска
   num_files = argc - optind;
-  
+
   while (optind < argc) {
     fp = fopen(argv[optind], "r");
     if (fp) {
       int over = 0;
-      while ((read = getline(&line, &len, fp)) != EOF) {
-        status = regexec(regex, line, 0, NULL, 0);
+      while ((read = getline(&line, &len, fp)) != EOF) { 
+        status = regexec(regex, line, 0, NULL, 0); //строка выполняет поиск регулярного выражения в строке, считанной из файла
         str_count++;
         if ((options->v && status == REG_NOMATCH) ||
             (status == 0 && (options->v == 0 || options->e))) {

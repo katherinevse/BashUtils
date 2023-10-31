@@ -59,7 +59,7 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
         break;
       case 'e':
         options->e = 1;
-        strcat(pattern, optarg); // optarg- аргумент в данный момент // optind - индекс  // указатель просто указывает на элемент массива argv[]).   // pattern = argument(name)
+        strcat(pattern, optarg); // optarg- аргумент(шаблон) в данный момент // optind - индекс  // указатель просто указывает на элемент массива argv[]).   // pattern = argument(name)
         strcat(pattern, "|"); //чтобы создать шаблон, который будет включать в себя несколько подшаблонов, разделенных символом |.
         if (reg_flag == 0) {
           reg_flag = 1; // REG_EXTENDED_FLAG
@@ -80,5 +80,28 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
     regcomp(regex, argv[optind], reg_flag); //Если опция -e не указана, программа просто берет следующий аргумент из командной строки (argv[optind]) и компилирует его как регулярное выражение. 
     optind++; //optind увеличивается для перехода к следующему аргументу
   }
-  Grep_Printf_i(argc, argv, &options, &regex);
+  read_file(argc, argv, &options, &regex);
+}
+
+
+void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
+  FILE *file;
+  int read = 0; // возвращает количество считанных символов
+  search_reg = 0;
+  int num_files = argc - optind; // Определяем количество переданных файлов для поиска
+
+  while(optind < argc){
+    file = fopen(argv[optind], "r");
+    if(file){
+      while((read = getline(&line, &len, fp)) != EOF){
+        search_reg = regexec(regex, line, 0, NULL, 0); //строка выполняет поиск регулярного выражения в строке
+
+      }
+    }
+  }
+  
+
+
+
+
 }

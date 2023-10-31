@@ -82,23 +82,3 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
   }
   Grep_Printf_i(argc, argv, &options, &regex);
 }
-
-void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex){
-  FILE *file;
-  char *line = 0;
-  int read = 0; // возвращает количество считанных символов
-
-  int num_files = argc - optind; // Определяем количество переданных файлов для поиска
-  while(optind<argc){
-    file = fopen(argv[optind], "r");
-    if (file){
-      int over = 0;
-      while ((read = getline(&line, &len, fp)) != EOF) {
-
-
-
-      }
-    }
-    
-  }
-}

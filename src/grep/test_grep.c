@@ -84,7 +84,7 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
     optind++; //optind увеличивается для перехода к следующему аргументу
   }
 }
-// почему после отработки флага е мы заканчиваем парсить что-любо?
+// почему после отработки флага е мы заканчиваем парсить что-либо?
 
 void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex) {
   FILE *fp;

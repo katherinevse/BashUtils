@@ -95,7 +95,7 @@ void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
   while(optind < argc){
     file = fopen(argv[optind], "r");
     if(file){
-      while((read = getline(&line, &len, fp)) != EOF){
+      while((read = getline(&line, &len, file)) != EOF){
         search_reg = regexec(regex, line, 0, NULL, 0); //строка выполняет поиск регулярного выражения в строке
 
       }

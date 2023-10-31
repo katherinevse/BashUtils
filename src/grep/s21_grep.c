@@ -88,7 +88,7 @@ void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
   FILE *file;
   int read = 0; // возвращает количество считанных символов
   int search_reg = 0;
-  int line = 0;
+  char * line = NULL;
   int len = 0;
   int num_files = argc - optind; // Определяем количество переданных файлов для поиска
 

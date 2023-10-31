@@ -88,14 +88,14 @@ void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
   FILE *file;
   int read = 0; // возвращает количество считанных символов
   int search_reg = 0;
-  char * line = NULL;
+  char *line = NULL; //line - это указатель на символ
   int len = 0;
   int num_files = argc - optind; // Определяем количество переданных файлов для поиска
 
   while(optind < argc){
     file = fopen(argv[optind], "r");
     if(file){
-      while((read = getline(&line, &len, file)) != EOF){
+      while((read = getline(&line, &len, file)) != EOF){ //В этот момент указатель line начинает указывать на выделенную память.
         search_reg = regexec(regex, line, 0, NULL, 0); //строка выполняет поиск регулярного выражения в строке
 
       }

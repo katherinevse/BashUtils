@@ -27,6 +27,7 @@ int main(int argc, char * argv[]){
   } else if ((argc >= 3)) {
     parcer(argc, argv, &options, &regex);
   }
+  return 0;
 }
 
 void parcer(int argc, char *argv[], opt *options, regex_t *regex) {

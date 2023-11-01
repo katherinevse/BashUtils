@@ -1,4 +1,3 @@
-
 void my_parser(const int argc, char *argv[]) {
   struct opt options;
   options.b = 0;  // Нумеровать только непустые строки, отменяет -n

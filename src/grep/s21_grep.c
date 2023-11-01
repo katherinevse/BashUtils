@@ -2,7 +2,7 @@
 #include <string.h>
 
 void parcer(int argc, char *argv[], opt *options, regex_t *regex);
-void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex);
+void read_file(int argc, char *argv[], opt *options, regex_t *regex);
 
 int main(int argc, char * argv[]){
   regex_t regex; // скомпилированный паттерн лежит 
@@ -81,30 +81,91 @@ void parcer(int argc, char *argv[], opt *options, regex_t *regex) {
     regcomp(regex, argv[optind], reg_flag); //Если опция -e не указана, программа просто берет следующий аргумент из командной строки (argv[optind]) и компилирует его как регулярное выражение. 
     optind++; //optind увеличивается для перехода к следующему аргументу
   }
-  read_file(argc, argv, &options, &regex);
+  read_file(argc, argv,options, regex);
 }
+
 
 
 void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
   FILE *file;
+   char *line = NULL;
+  size_t len = 0;
   int read = 0; // возвращает количество считанных символов
   int search_reg = 0;
-  char *line = NULL; //line - это указатель на символ
-  int len = 0;
+  int str_count = 0;
+  int str_count_c = 0;
   int num_files = argc - optind; // Определяем количество переданных файлов для поиска
 
   while(optind < argc){
     file = fopen(argv[optind], "r");
     if(file){
-      while((read = getline(&line, &len, file)) != EOF){ //В этот момент указатель line начинает указывать на выделенную память.
+      int over = 0; //было ли уже выведено имя файла
+      while((read = getline(&line, &len, file)) != EOF){
         search_reg = regexec(regex, line, 0, NULL, 0); //строка выполняет поиск регулярного выражения в строке
+        // если regexes возвращает 0 значит строка соответсвует шаблону (регул.выражению)
 
+        str_count++; 
+        // проверка на должны ли быть выведены результаты поиска (например, строки из файла) в зависимости от условий поиска и установленных флагов. Если условия выполняются, то выводится информация о файле или строке.
+        if ((options->v && search_reg == REG_NOMATCH) || (search_reg == 0 && (options->v == 0 || options->e))) {
+          //проверка на должны ли быть выведены результаты поиска
+          if (num_files > 1 && options->h == 0 && options->c == 0 && options->l == 0){
+            printf("%s:", argv[optind]);
+          }
+          //отработка флага n
+          if (options->n && options->c == 0 && options->l == 0) {
+            printf("%d:%s", str_count, line);
+            if (line[strlen(line) - 1] != '\n') {
+              printf("\n");
+            }
+          }
+          //отработка флага с 
+          else if (options->c) 
+          {
+            str_count_c++;
+          }
+          //флаг l
+          else if (options->l && over == 0) {
+            printf("%s\n", argv[optind]);
+            over++;
+          }
+          else if (options->l == 0) {
+            printf("%s", line);
+            if (line[strlen(line) - 1] != '\n') {
+              printf("\n");
+            }
+          }
+        }
+      }
+      // выводит количество строк совпадения в каждом файле, а при наличии нескольких файлов также выводит их имена.
+      if (options->c) {
+        if (num_files > 1 && options->h == 0) {
+          printf("%s:%d\n", argv[optind], str_count_c);
+        } else {
+          printf("%d\n", str_count_c);
+        }
+        str_count_c = 0; // Сбрасывает счетчик совпадающих строк для следующего файла.
+      }
+      if (options->n) {
+        str_count = 0;
       }
     }
+     else {
+      if (options->s == 0) {
+        fprintf(stderr, "s21_grep: %s: No such file or directory\n",
+                argv[optind]);
+      }
+     }
+     optind++;
   }
-  
-
-
-
+  fclose(file);
+  exit(0);
+  free(line);
+  regfree(regex);
 
 }
+
+        //v выводит строки, которые НЕ содержат указанный шаблон.
+        //-h исключит отображение имени файла перед каждой строкой совпадения.
+        //-с используется для вывода только количества строк, содержащих совпадения, а не самих строк
+        // -n в команде grep добавляет номера строк, в каких строках файла были обнаружены совпадения с заданным шаблоном
+        //-l  выводить только имена файлов где есть шаблон 

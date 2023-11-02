@@ -29,10 +29,13 @@ int main(int argc, char *argv[]) {
 }
 
 void parser(int argc, char *argv[], opt *options, regex_t *regex) {
-  int flag = 0;
-  int reg_flag = 0; 
-  char pattern[1000]; //sample 
-  while ((flag = getopt_long(argc, argv, "e:ivclnsoh", NULL, NULL)) !=(-1)) { 
+  int flag = 0; 
+  int reg_flag = 0;  // установки флагов регулярных выражений, для i, для е jndtxftn pf hfcibhtybz 
+  char pattern[1000];  // для хранения шаблона регулярного выражения. При
+                       // обработке опции -e, значение этой опции (которое
+                       // передается через optarg
+  while ((flag = getopt_long(argc, argv, "e:ivclnsoh", NULL, NULL)) !=
+         (-1)) {  // почему именно такая запись? e:ivclnsoh
     switch (flag) {
       case 'i':
         options->i = 1;
@@ -58,10 +61,15 @@ void parser(int argc, char *argv[], opt *options, regex_t *regex) {
         break;
       case 'e':
         options->e = 1;
-        strcat(pattern, optarg);
-        strcat(pattern,"|"); 
+        strcat(pattern,
+               optarg);  // optarg- аргумент(шаблон) в данный момент // optind -
+                         // индекс  // указатель просто указывает на элемент
+                         // массива argv[]).   // pattern = argument(name)
+        strcat(pattern,
+               "|");  //чтобы создать шаблон, который будет включать в себя
+                      //несколько подшаблонов, разделенных символом |.
         if (reg_flag == 0) {
-          reg_flag = REG_EXTENDED; //1
+          reg_flag = 1;  // REG_EXTENDED_FLAG
         }
         pattern[strlen(pattern) - 1] = '\0';
         break;
@@ -69,10 +77,15 @@ void parser(int argc, char *argv[], opt *options, regex_t *regex) {
   }
   if (options->e) {
     regcomp(regex, pattern, reg_flag);
+    // regex: Это указатель на структуру regex_t, в которую будет сохранено
+    // скомпилированное регулярное выражение. pattern: Это строка, содержащая
+    // само регулярное выражение, которое нужно скомпилировать
   } else {
-    regcomp(regex, argv[optind], reg_flag); //предполагается шаблоном
-    printf("My arg:%s\n",argv[optind]);
-    optind++;
+    regcomp(regex, argv[optind],
+            reg_flag);  //Если опция -e не указана, программа просто берет
+                        //следующий аргумент из командной строки (argv[optind])
+                        //и компилирует его как регулярное выражение.
+    optind++;  // для перехода к следующему аргументу
   }
   read_file(argc, argv, options, regex);
 }
@@ -81,23 +94,27 @@ void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
   FILE *file;
   char *line = NULL;
   size_t len = 0;
-  int read = 0;  // number of characters read
+  int read = 0;  // возвращает количество считанных символов
   int search_reg = 0;
   int str_count = 0;
   int str_count_c = 0;
-  int num_files = argc - optind; 
+  int num_files =
+      argc - optind;  // Определяем количество переданных файлов для поиска
+
   while (optind < argc) {
     file = fopen(argv[optind], "r");
     if (file) {
-      
       int over = 0;  //было ли уже выведено имя файла
       while ((read = getline(&line, &len, file)) != EOF) {
-        search_reg =regexec(regex, line, 0, NULL, 0);  
+        search_reg =
+            regexec(regex, line, 0, NULL,0);  //строка выполняет поиск регулярного выражения в строке если regexes возвращает 0 значит строка соответсвует шаблону
         str_count++;
-
+        // проверка на должны ли быть выведены результаты поиска (например,
+        // строки из файла) в зависимости от условий поиска и установленных
+        // флагов. Если условия выполняются, то выводится информация о файле или
+        // строке.
         if ((options->v && search_reg == REG_NOMATCH) ||
             (search_reg == 0 && (options->v == 0 || options->e))) {
-
           //проверка на должны ли быть выведены результаты поиска
           if (num_files > 1 && options->h == 0 && options->c == 0 &&
               options->l == 0) {
@@ -111,10 +128,10 @@ void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
             }
           }
           //отработка флага с
+          //флаг l
           else if (options->l && over == 0) {
             printf("%s\n", argv[optind]);
             over++;
-          //флаг l    
           } else if (options->l == 0) {
             printf("%s", line);
             if (line[strlen(line) - 1] != '\n') {
@@ -150,7 +167,11 @@ void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
 
 // v выводит строки, которые НЕ содержат указанный шаблон.
 //-h исключит отображение имени файла перед каждой строкой совпадения.
-//-с используется для вывода только количества строк, содержащих совпадения, а не самих строк
+//-с используется для вывода только количества строк, содержащих совпадения, а
+//не самих строк
 //  -n в команде grep добавляет номера строк, в каких строках файла были
 //  обнаружены совпадения с заданным шаблоном
 //-l  выводить только имена файлов где есть шаблон
+
+
+//шаблон нам нужен для каких флагов? 

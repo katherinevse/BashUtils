@@ -16,10 +16,10 @@ typedef struct options {
   int n;
   int h;
   int s;
-  int o;
 } opt;
 opt options = {0};
 
-void parcer(int argc, char *argv[], opt *options, regex_t *regex);
-void Grep_Printf_i(int argc, char *argv[], opt *options, regex_t *regex);
+void parser(int argc, char *argv[], opt *options, regex_t *regex);
+void read_file(int argc, char *argv[], opt *options, regex_t *regex);
+
 #endif

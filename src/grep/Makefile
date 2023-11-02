@@ -11,8 +11,5 @@ check_style:
 style:
 	clang-format -style=google -i *.c *.h
 
-test:
-	
-	
 clean:
 	rm -rf s21_grep s21_cat

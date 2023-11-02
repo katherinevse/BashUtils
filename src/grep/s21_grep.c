@@ -78,43 +78,38 @@ void parser(int argc, char *argv[], opt *options, regex_t *regex) {
 }
 
 void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
-  FILE *file;
+FILE *fp;
   char *line = NULL;
   size_t len = 0;
-  int read = 0;  // number of characters read
-  int search_reg = 0;
+  int read = 0;
+  int status = 0;
   int str_count = 0;
   int str_count_c = 0;
-  int num_files = argc - optind; 
+  int names = 0;
+  names = argc - optind;
   while (optind < argc) {
-    file = fopen(argv[optind], "r");
-    if (file) {
-      
-      int over = 0;  //было ли уже выведено имя файла
-      while ((read = getline(&line, &len, file)) != EOF) {
-        search_reg =regexec(regex, line, 0, NULL, 0);  
+    fp = fopen(argv[optind], "r");
+    if (fp) {
+      int over = 0;
+      while ((read = getline(&line, &len, fp)) != EOF) {
+        status = regexec(regex, line, 0, NULL, 0);
         str_count++;
-
-        if ((options->v && search_reg == REG_NOMATCH) ||
-            (search_reg == 0 && (options->v == 0 || options->e))) {
-
-          //проверка на должны ли быть выведены результаты поиска
-          if (num_files > 1 && options->h == 0 && options->c == 0 &&
+        if ((options->v && status == REG_NOMATCH) ||
+            (status == 0 && (options->v == 0 || options->e))) {
+          if (names > 1 && options->h == 0 && options->c == 0 &&
               options->l == 0) {
             printf("%s:", argv[optind]);
           }
-          //отработка флага n
           if (options->n && options->c == 0 && options->l == 0) {
             printf("%d:%s", str_count, line);
             if (line[strlen(line) - 1] != '\n') {
               printf("\n");
             }
-          }
-          //отработка флага с
-          else if (options->l && over == 0) {
+          } else if (options->c) {
+            str_count_c++;
+          } else if (options->l && over == 0) {
             printf("%s\n", argv[optind]);
             over++;
-          //флаг l    
           } else if (options->l == 0) {
             printf("%s", line);
             if (line[strlen(line) - 1] != '\n') {
@@ -123,16 +118,16 @@ void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
           }
         }
       }
-      // выводит количество строк совпадения в каждом файле, а при наличии
-      // нескольких файлов также выводит их имена.
       if (options->c) {
-        if (num_files > 1 && options->h == 0) {
+        if (names > 1 && options->h == 0) {
           printf("%s:%d\n", argv[optind], str_count_c);
         } else {
           printf("%d\n", str_count_c);
         }
-        str_count_c =
-            0;  // Сбрасывает счетчик совпадающих строк для следующего файла.
+        str_count_c = 0;
+      }
+      if (options->n) {
+        str_count = 0;
       }
     } else {
       if (options->s == 0) {
@@ -142,7 +137,7 @@ void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
     }
     optind++;
   }
-  fclose(file);
+  fclose(fp);
   exit(0);
   free(line);
   regfree(regex);

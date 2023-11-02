@@ -70,14 +70,14 @@ void parser(int argc, char *argv[], opt *options, regex_t *regex) {
   if (options->e) {
     regcomp(regex, pattern, reg_flag);
   } else {
-    regcomp(regex, argv[optind], reg_flag); //предполагается шаблоном
+    regcomp(regex, argv[optind], reg_flag);
     optind++;
   }
   read_file(argc, argv, options, regex);
 }
 
 void read_file(int argc, char *argv[], opt *options, regex_t *regex) {
-FILE *fp;
+FILE *file;
   char *line = NULL;
   size_t len = 0;
   int read = 0;
@@ -87,10 +87,10 @@ FILE *fp;
   int names = 0;
   names = argc - optind;
   while (optind < argc) {
-    fp = fopen(argv[optind], "r");
-    if (fp) {
+    file = fopen(argv[optind], "r");
+    if (file) {
       int over = 0;
-      while ((read = getline(&line, &len, fp)) != EOF) {
+      while ((read = getline(&line, &len, file)) != EOF) {
         status = regexec(regex, line, 0, NULL, 0);
         str_count++;
         if ((options->v && status == REG_NOMATCH) ||
@@ -136,7 +136,7 @@ FILE *fp;
     }
     optind++;
   }
-  fclose(fp);
+  fclose(file);
   exit(0);
   free(line);
   regfree(regex);

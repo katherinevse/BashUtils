@@ -71,7 +71,7 @@ void parser(int argc, char *argv[], opt *options, regex_t *regex) {
     regcomp(regex, pattern, reg_flag);
   } else {
     regcomp(regex, argv[optind], reg_flag); //предполагается шаблоном
-    printf("My arg:%s\n",argv[optind]);
+    //printf("My arg:%s\n",argv[optind]);
     optind++;
   }
   read_file(argc, argv, options, regex);

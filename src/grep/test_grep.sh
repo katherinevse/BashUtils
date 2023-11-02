@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TEST_DATA_FOLDER="../../datasets/test_data"
+TEST_DATA_FOLDER="../test_data"
 
 # Переменные для подсчета пройденных и не пройденных тестов
 passed_tests=0

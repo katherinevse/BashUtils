@@ -6,16 +6,15 @@
 #include <stdlib.h>
 
 typedef struct options {
-  int b;
-  int e;
-  int n;
-  int s;
-  int t;
-  int v;
+    int b;
+    int e;
+    int n;
+    int s;
+    int t;
+    int v;
 } opt;
 opt options = {0};
 
-void just_cat(int argc, char *argv[]);
 void print_options(int cur, char *argv[], opt *options);
 void parser(int argc, char *argv[], opt *options);
 void read_file(int argc, char *argv[], opt *options);

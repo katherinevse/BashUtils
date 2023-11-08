@@ -1,11 +1,3 @@
-Hello
-hellohel
 hello
-hell
-
-Hello
-
-
-
-
-
+hello
+HELLO

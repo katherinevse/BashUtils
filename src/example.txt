@@ -1,0 +1,16 @@
+CAT:
+make
+./s21_cat -flag file.txt
+
+
+GREP:
+make
+./s21_grep -flag pattern file.txt
+
+
+
+TESTS:
+bash test_cat.sh
+sh test_grep.sh
+
+
